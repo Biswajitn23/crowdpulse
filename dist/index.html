@@ -22,6 +22,7 @@
                 </div>
             </div>
         </div>
+        <div id="message-container"></div>
         <!-- Main Upload Section (static, no backend) -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -33,7 +34,7 @@
                         </h4>
                     </div>
                     <div class="card-body">
-                        <form id="uploadForm" method="POST" enctype="multipart/form-data" onsubmit="alert('This is a static demo. Backend processing is disabled.'); return false;">
+                        <form id="uploadForm" action="https://crowdpulse-1igy.onrender.com/upload_video" method="POST" enctype="multipart/form-data">
                             <div class="mb-4">
                                 <label for="videoFile" class="form-label">
                                     <i class="fas fa-video"></i>

@@ -61,7 +61,34 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        startUpload();
+        // Use fetch to send to backend
+        const formData = new FormData();
+        formData.append('video', file);
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<span class="loading-spinner"></span> Uploading...';
+        uploadProgress.style.display = 'block';
+        progressBar.style.width = '0%';
+        
+        fetch('https://crowdpulse-1igy.onrender.com/upload_video', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            showAlert('Upload successful! ' + (data.message || ''), 'success');
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
+            uploadProgress.style.display = 'none';
+            progressBar.style.width = '0%';
+            // Optionally redirect or show results
+        })
+        .catch(error => {
+            showAlert('Upload failed. Please try again.', 'error');
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
+            uploadProgress.style.display = 'none';
+            progressBar.style.width = '0%';
+        });
     });
     
     // File input change handler
