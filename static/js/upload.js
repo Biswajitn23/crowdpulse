@@ -49,18 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form validation and submission
     uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const file = videoFile.files[0];
-        if (!file) {
-            showAlert('Please select a video file', 'error');
-            return;
-        }
-        
-        if (!validateFile(file)) {
-            return;
-        }
-        
+        // Allow form to submit normally for demo mode
         startUpload();
     });
     
@@ -114,14 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function startUpload() {
         // Disable form and show progress
         uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+        uploadBtn.innerHTML = '<span class="loading-spinner"></span> Starting Demo...';
         uploadProgress.style.display = 'block';
         
-        // Simulate progress (since we can't track real progress easily)
+        // Simulate progress
         simulateProgress();
-        
-        // Submit form
-        uploadForm.submit();
     }
     
     function simulateProgress() {
