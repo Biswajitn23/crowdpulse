@@ -23,11 +23,12 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 UPLOAD_FOLDER = 'static/uploads'
 PROCESSED_FOLDER = 'static/processed'
 ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv'}
-MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB max file size
+MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB max file size (reduced for stability)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+app.config['UPLOAD_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
 # Ensure directories exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -47,24 +48,41 @@ def index():
     """Main page with upload form"""
     return render_template('index.html')
 
+@app.route('/test', methods=['GET', 'POST'])
+def test_upload():
+    """Test upload endpoint"""
+    if request.method == 'POST':
+        try:
+            file = request.files.get('video')
+            if file:
+                return jsonify({
+                    'status': 'success',
+                    'filename': file.filename,
+                    'size': len(file.read()),
+                    'content_type': file.content_type
+                })
+            else:
+                return jsonify({'status': 'error', 'message': 'No file received'})
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)})
+    return '''
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="video" accept="video/*">
+        <button type="submit">Test Upload</button>
+    </form>
+    '''
+
 @app.route('/upload', methods=['POST'])
 def upload_video():
     """Handle video upload and start processing"""
     try:
-        # Check if files are in request
-        if not request.files:
-            flash('No files uploaded', 'error')
-            return redirect(url_for('index'))
-            
-        if 'video' not in request.files:
-            flash('No video file selected', 'error')
-            return redirect(url_for('index'))
-        
-        file = request.files['video']
+        # Get the file from request
+        file = request.files.get('video')
         if not file or file.filename == '':
             flash('No video file selected', 'error')
             return redirect(url_for('index'))
         
+        # Check file extension
         if not allowed_file(file.filename):
             flash('Invalid file format. Please upload MP4, AVI, MOV, MKV, FLV, or WMV files.', 'error')
             return redirect(url_for('index'))
@@ -78,6 +96,11 @@ def upload_video():
         # Save uploaded file
         input_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(input_path)
+        
+        # Verify file was saved
+        if not os.path.exists(input_path):
+            flash('File upload failed. Please try again.', 'error')
+            return redirect(url_for('index'))
         
         # Store session data
         session['file_id'] = file_id

@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progressBar');
     const videoFile = document.getElementById('videoFile');
     
-    // File size limit (100MB)
-    const MAX_FILE_SIZE = 100 * 1024 * 1024;
+    // File size limit (50MB)
+    const MAX_FILE_SIZE = 50 * 1024 * 1024;
     
     // Supported video formats
     const SUPPORTED_FORMATS = [
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateFile(file) {
         // Check file size
         if (file.size > MAX_FILE_SIZE) {
-            showAlert('File size exceeds 100MB limit. Please choose a smaller file.', 'error');
+            showAlert('File size exceeds 50MB limit. Please choose a smaller file.', 'error');
             return false;
         }
         
