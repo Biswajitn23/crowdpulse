@@ -26,10 +26,10 @@
         <!-- Action Buttons -->
         <div class="row mb-4">
             <div class="col-12 text-center">
-                <button class="btn btn-success btn-lg me-3" onclick="showAlert('Download feature available in full version', 'info')">
+                <a href="{{ url_for('download_video', file_id=file_id) }}" class="btn btn-success btn-lg me-3">
                     <i class="fas fa-download"></i>
-                    Download Demo Video
-                </button>
+                    Download Processed Video
+                </a>
                 <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
                     <i class="fas fa-plus"></i>
                     Analyze Another Video

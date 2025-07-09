@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progressBar');
     const videoFile = document.getElementById('videoFile');
     
-    // File size limit (50MB)
-    const MAX_FILE_SIZE = 50 * 1024 * 1024;
+    // File size limit (25MB)
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
     
     // Supported video formats
     const SUPPORTED_FORMATS = [
@@ -49,7 +49,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form validation and submission
     uploadForm.addEventListener('submit', function(e) {
-        // Allow form to submit normally for demo mode
+        e.preventDefault();
+        
+        const file = videoFile.files[0];
+        if (!file) {
+            showAlert('Please select a video file', 'error');
+            return;
+        }
+        
+        if (!validateFile(file)) {
+            return;
+        }
+        
         startUpload();
     });
     
@@ -65,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateFile(file) {
         // Check file size
         if (file.size > MAX_FILE_SIZE) {
-            showAlert('File size exceeds 50MB limit. Please choose a smaller file.', 'error');
+            showAlert('File size exceeds 25MB limit. Please choose a smaller file.', 'error');
             return false;
         }
         
@@ -103,11 +114,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function startUpload() {
         // Disable form and show progress
         uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<span class="loading-spinner"></span> Starting Demo...';
+        uploadBtn.innerHTML = '<span class="loading-spinner"></span> Uploading...';
         uploadProgress.style.display = 'block';
         
         // Simulate progress
         simulateProgress();
+        
+        // Submit form after short delay
+        setTimeout(() => {
+            uploadForm.submit();
+        }, 1000);
     }
     
     function simulateProgress() {

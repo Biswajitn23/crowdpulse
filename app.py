@@ -23,7 +23,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 UPLOAD_FOLDER = 'static/uploads'
 PROCESSED_FOLDER = 'static/processed'
 ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv'}
-MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB max file size (reduced for stability)
+MAX_CONTENT_LENGTH = 25 * 1024 * 1024  # 25MB max file size (reduced for stability)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
@@ -76,66 +76,46 @@ def test_upload():
 def upload_video():
     """Handle video upload and start processing"""
     try:
-        # Create a simple mock upload process to avoid file parsing issues
-        # Generate a demo file for testing
-        file_id = str(uuid.uuid4())
-        filename = "demo_video.mp4"
+        # Check if request has file part
+        if 'video' not in request.files:
+            flash('No file part', 'error')
+            return redirect(url_for('index'))
         
-        # Store session data
-        session['file_id'] = file_id
-        session['original_filename'] = filename
-        session['upload_time'] = datetime.now().isoformat()
+        file = request.files['video']
         
-        logging.info(f"Demo upload processed: {filename}")
-        return redirect(url_for('process_demo', file_id=file_id))
+        # Check if file is selected
+        if file.filename == '':
+            flash('No file selected', 'error')
+            return redirect(url_for('index'))
         
+        # Validate file type
+        if file and allowed_file(file.filename):
+            # Generate unique filename
+            file_id = str(uuid.uuid4())
+            filename = secure_filename(file.filename)
+            file_extension = filename.rsplit('.', 1)[1].lower()
+            unique_filename = f"{file_id}.{file_extension}"
+            
+            # Save file
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            file.save(file_path)
+            
+            # Store in session
+            session['file_id'] = file_id
+            session['original_filename'] = filename
+            session['upload_time'] = datetime.now().isoformat()
+            
+            logging.info(f"File uploaded: {filename}")
+            
+            # Redirect to processing
+            return redirect(url_for('process_video', file_id=file_id))
+        else:
+            flash('Invalid file type', 'error')
+            return redirect(url_for('index'))
+            
     except Exception as e:
         logging.error(f"Upload error: {str(e)}")
         flash(f'Upload failed: {str(e)}', 'error')
-        return redirect(url_for('index'))
-
-@app.route('/process_demo/<file_id>')
-def process_demo(file_id):
-    """Process demo video and show results"""
-    try:
-        # Validate file_id
-        if 'file_id' not in session or session['file_id'] != file_id:
-            flash('Invalid session or file ID', 'error')
-            return redirect(url_for('index'))
-        
-        # Generate demo results
-        results = {
-            'total_frames': 300,
-            'total_people_detected': 45,
-            'avg_people_per_frame': 2.3,
-            'max_people_count': 8,
-            'max_people_frame': 150,
-            'max_people_timestamp': 5.2,
-            'video_duration': 10.5,
-            'fps': 30,
-            'resolution': '1920x1080',
-            'density_stats': {
-                'max_density': 15.2,
-                'avg_density': 3.8,
-                'total_activity': 245.6
-            },
-            'processing_time': datetime.now().isoformat()
-        }
-        
-        # Store results in session
-        session['results'] = results
-        session['output_filename'] = f"processed_{file_id}.mp4"
-        
-        logging.info(f"Demo processing completed: {results}")
-        return render_template('results.html', 
-                             results=results, 
-                             file_id=file_id,
-                             original_filename=session.get('original_filename', 'demo_video.mp4'),
-                             output_filename=session.get('output_filename'))
-        
-    except Exception as e:
-        logging.error(f"Processing error: {str(e)}")
-        flash(f'Processing failed: {str(e)}', 'error')
         return redirect(url_for('index'))
 
 @app.route('/process/<file_id>')

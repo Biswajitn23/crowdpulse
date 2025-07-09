@@ -18,7 +18,7 @@
                         <i class="fas fa-users text-primary"></i>
                         Crowd Density Detection System
                     </h1>
-                    <p class="lead">AI-powered crowd density detection system - Demo Mode</p>
+                    <p class="lead">Upload a video to analyze crowd density using AI-powered person detection</p>
                 </div>
             </div>
         </div>
@@ -42,24 +42,28 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-play"></i>
-                            Demo Analysis
+                            <i class="fas fa-upload"></i>
+                            Upload Video for Analysis
                         </h4>
                     </div>
                     <div class="card-body">
-                        <form id="uploadForm" action="{{ url_for('upload_video') }}" method="POST">
+                        <form id="uploadForm" action="{{ url_for('upload_video') }}" method="POST" enctype="multipart/form-data">
                             <div class="mb-4">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    <strong>Demo Mode:</strong> This is a demonstration of the crowd density detection system. 
-                                    Click "Start Demo Analysis" to see sample results.
+                                <label for="videoFile" class="form-label">
+                                    <i class="fas fa-video"></i>
+                                    Select Video File
+                                </label>
+                                <input type="file" class="form-control" id="videoFile" name="video" 
+                                       accept="video/mp4,video/avi,video/mov,video/mkv,video/flv,video/wmv" required>
+                                <div class="form-text">
+                                    Supported formats: MP4, AVI, MOV, MKV, FLV, WMV (Max: 25MB)
                                 </div>
                             </div>
                             
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn">
                                     <i class="fas fa-play"></i>
-                                    Start Demo Analysis
+                                    Start Analysis
                                 </button>
                             </div>
                         </form>
@@ -71,7 +75,7 @@
                                      role="progressbar" style="width: 0%" id="progressBar"></div>
                             </div>
                             <div class="text-center mt-2">
-                                <small class="text-muted">Generating demo results...</small>
+                                <small class="text-muted">Uploading and processing video...</small>
                             </div>
                         </div>
                     </div>

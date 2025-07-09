@@ -57,7 +57,10 @@ class VideoProcessor:
             max_people_count = 0
             self.frame_stats = []
             
-            # Process frames
+            # Process frames (skip frames for faster processing)
+            process_every_n_frames = 3  # Only process every 3rd frame
+            last_detections = []
+            
             while True:
                 ret, frame = cap.read()
                 if not ret:
@@ -65,8 +68,15 @@ class VideoProcessor:
                 
                 frame_count += 1
                 
-                # Detect people in frame
-                detections = self.detector.detect_people(frame)
+                # Skip frames to speed up processing
+                if frame_count % process_every_n_frames == 0:
+                    # Process this frame
+                    detections = self.detector.detect_people(frame)
+                    last_detections = detections
+                else:
+                    # Use previous detection results
+                    detections = last_detections
+                
                 people_count = len(detections)
                 total_people_detected += people_count
                 
