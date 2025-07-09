@@ -1,5 +1,28 @@
 // Upload functionality and UI interactions for Crowd Density Detection System
 
+// Global utility functions
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert alert at the top of the container
+    const container = document.querySelector('.container');
+    const firstChild = container.firstElementChild;
+    container.insertBefore(alertDiv, firstChild.nextSibling);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('uploadForm');
     const uploadBtn = document.getElementById('uploadBtn');
@@ -183,27 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
-    function showAlert(message, type) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        // Insert alert at the top of the container
-        const container = document.querySelector('.container');
-        const firstChild = container.firstElementChild;
-        container.insertBefore(alertDiv, firstChild.nextSibling);
-        
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 5000);
-    }
+    // showAlert function moved to global scope above
     
     // Real-time file validation
     videoFile.addEventListener('change', function() {

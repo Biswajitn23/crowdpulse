@@ -51,12 +51,17 @@ def index():
 def upload_video():
     """Handle video upload and start processing"""
     try:
+        # Check if files are in request
+        if not request.files:
+            flash('No files uploaded', 'error')
+            return redirect(url_for('index'))
+            
         if 'video' not in request.files:
             flash('No video file selected', 'error')
             return redirect(url_for('index'))
         
         file = request.files['video']
-        if file.filename == '':
+        if not file or file.filename == '':
             flash('No video file selected', 'error')
             return redirect(url_for('index'))
         
