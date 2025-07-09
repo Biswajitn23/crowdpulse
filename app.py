@@ -11,6 +11,7 @@ from utils.heatmap import HeatmapGenerator
 import uuid
 import json
 from datetime import datetime
+from flask_cors import CORS
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -18,6 +19,10 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crowd_detection_secret_key_2024")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+CORS(app, origins=[
+    "https://stirring-douhua-7a0209.netlify.app",
+    "https://lucky-brioche-59abc6.netlify.app"
+])
 
 # Configuration
 UPLOAD_FOLDER = 'static/uploads'
