@@ -1,1 +1,7 @@
-flask-cors 
+flask-cors
+flask
+gunicorn
+opencv-python
+torch
+torchvision
+# + anything else you need (like jinja2 etc.)
